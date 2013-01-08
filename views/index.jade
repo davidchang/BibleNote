@@ -15,5 +15,8 @@ block content
         div
           button.btn-primary(ng-click="saveNote()") Submit
       div.note(ng-repeat="note in notes", id="note{{note.verse}}")
-        span {{note.verse}}
+        span.verseNumber {{note.verse}}
         span {{note.note}}
+  script
+    var theText = !{JSON.stringify(theText)};
+    var thePassage = '!{thePassage}';

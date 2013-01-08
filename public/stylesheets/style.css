@@ -1,6 +1,9 @@
 header {
   text-align: center;
 }
+header:first-letter {
+  text-transform: uppercase;
+}
 .verse {
   margin: 0px 3px;
   color: #333;
@@ -10,7 +13,7 @@ header {
 .verse:hover {
   background-color: lightblue;
 }
-.verse .verseNumber {
+.verseNumber {
   margin-right: 3px;
   color: #666;
 }

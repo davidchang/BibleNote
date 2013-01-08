@@ -3,10 +3,15 @@ var App = angular.module('App', ['ngSanitize']);
 App.controller('TodoCtrl', function($scope, $http) {
     $scope.todos = [];
 
-    $http.get('/get/Nahum1')
-        .then(function(res){
-            $scope.todos = res.data;
-        });
+    if(theText) {
+        $scope.todos = JSON.parse(theText);
+    }
+    else {
+        $http.get('/get/' + thePassage)
+            .then(function(res){
+                $scope.todos = res.data;
+            });
+    }
 
     $scope.notes = [];
 

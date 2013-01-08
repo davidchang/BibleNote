@@ -41,7 +41,9 @@ app.get('/:text', function(req, res) {
     var match = passageRegex.exec(text);
     if(match) {
         var passage = match.slice(1).join(' ');
-        res.render('index', { title: passage });   
+        BibleAPI.get(passage, function(data) {
+            res.render('index', { title: passage, theText: data, thePassage: passage });
+        });
     }
     else {
         res.render('index', { title: passage });   
