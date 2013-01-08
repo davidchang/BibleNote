@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  header
+    h1= title
+  .row-fluid
+    #scripture.span5.offset1
+      .verse(ng-click="writeNote(todo)", ng-repeat="todo in todos", id="{{todo.verse}}")
+        span.verseNumber {{todo.verse}}
+        span.verseText(ng-bind-html="todo.text")
+    #notes.span4
+      form#addNote.hidden
+        div
+          textarea#note(ng-model="note")
+        div
+          button.btn-primary(ng-click="saveNote()") Submit
+      div.note(ng-repeat="note in notes", id="note{{note.verse}}")
+        span {{note.verse}}
+        span {{note.note}}
