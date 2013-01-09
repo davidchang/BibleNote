@@ -18,7 +18,9 @@ block content
         .span12 Select a verse to get started
       .row-fluid(ng-show="verseSelected")
         .span12 Writing a note for verse {{writingFor.verse}}:
-      textarea#note(ng-model='note', ng-show='writingFor')
+        .span12
+          textarea#note(ng-model='note', ng-show='writingFor')
+          button.pull-right(ng-disabled='!note.length') Save Note
   script
     var theText = !{JSON.stringify(theText)};
     var thePassage = '!{thePassage}';

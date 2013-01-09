@@ -32,9 +32,12 @@ App.controller('TodoCtrl', function($scope, $http) {
 
         $(function() {
             $('#note').focus();
+            setTimeout(function() {
+                $('#note').focus();
+            }, 10);
             /*
-            var p = $('#' + todo.verse).position();
-            $('#addNote').css('top', p.top).removeClass('hidden');
+                var p = $('#' + todo.verse).position();
+                $('#addNote').css('top', p.top).removeClass('hidden');
             */
         });
     }
