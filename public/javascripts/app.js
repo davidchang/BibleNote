@@ -15,15 +15,27 @@ App.controller('TodoCtrl', function($scope, $http) {
 
     $scope.notes = [];
 
+    //Options
     $scope.showVerseNum = true;
+    $scope.showVersesPerLine = false;
 
     $scope.writingFor = null;
+    $scope.verseSelected = false;
 
     $scope.writeNote = function(todo){
-        $scope.writingFor = todo.verse;
+        if($scope.writingFor)
+            $scope.writingFor.writingNoteFor = false;
+
+        $scope.verseSelected = true;
+        $scope.writingFor = todo;
+        todo.writingNoteFor = true;
+
         $(function() {
+            $('#note').focus();
+            /*
             var p = $('#' + todo.verse).position();
             $('#addNote').css('top', p.top).removeClass('hidden');
+            */
         });
     }
 
