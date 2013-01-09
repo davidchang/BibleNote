@@ -3,11 +3,24 @@ header {
     &:first-letter {
         text-transform: uppercase;
     }
+    #showVerseNumbers {
+        vertical-align: top;
+        margin-right: 5px;
+    }
+}
+#scripture {
+    margin-top: 10px;
+    margin-bottom: 40px;
+
+    &.noVerseNumbers > .verse > .verseNumber {
+        display: none;
+    }
 }
 .verse {
     margin: 0px 3px;
     color: #333;
-    display: inline-block;
+}
+#takeNotes .verse {
     cursor: pointer;
     &:hover {
         background-color: lightblue;
@@ -17,12 +30,22 @@ header {
     margin-right: 3px;
     color: #666;
 }
-#note {
+#notes textarea {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    width: 320px;
+    width: 100%;
+    height: 400px;
 }
 #addNote {
     position: absolute;
+}
+body {
+    background-color: #FFF;
+    color: #333;
+}
+#wrapper {
+    width: 80%;
+    max-width: 960px;
+    margin: 0 auto;
 }

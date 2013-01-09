@@ -35,23 +35,74 @@ app.get('/get/:text', function(req, res) {
     });
 });
 
+String.prototype.capitalize = function(){
+    return this.replace(/(^[a-z]|[ .,\(\)\[\]]+[a-z])/g, function(s) {
+        return s.toUpperCase();
+    });
+};
+
+function trim(word) {
+    return word.replace(/^\s+|\s+$/g, '').capitalize();
+}
+
+function getBookName(match) {
+    var name = match.slice(1, match.length - 1).join(' ');
+    name = trim(name).toLowerCase();
+    return name;
+}
+
+app.get('/:text/takeNotes', function(req, res) {
+    var text = req.params.text;
+    var passageRegex = /^([0-9]*)([a-zA-Z]+)([0-9]+)$/;
+    var match = passageRegex.exec(text);
+
+    var onFailure = function() {
+        res.redirect('/');
+    };
+
+    if(match) {
+        var passage = trim(match.slice(1).join(' '));
+        BibleAPI.get(passage, function(data) {
+            var jsonData = JSON.parse(data)[0];
+            if(data && data.length && jsonData.bookname.toLowerCase() == getBookName(match) && jsonData.chapter == match[match.length - 1])
+                res.render('takeNotesView', { title: passage, theText: data, thePassage: passage });
+            else
+                onFailure();
+        }, function(error) {
+            onFailure();
+        });
+    }
+    else
+        onFailure();
+});
+
 app.get('/:text', function(req, res) {
     var text = req.params.text;
     var passageRegex = /^([0-9]*)([a-zA-Z]+)([0-9]+)$/;
     var match = passageRegex.exec(text);
+
+    var onFailure = function() {
+        res.redirect('/');
+    };
+
     if(match) {
-        var passage = match.slice(1).join(' ');
+        var passage = trim(match.slice(1).join(' '));
         BibleAPI.get(passage, function(data) {
-            res.render('index', { title: passage, theText: data, thePassage: passage });
+            var jsonData = JSON.parse(data)[0];
+            if(data && data.length && jsonData.bookname.toLowerCase() == getBookName(match) && jsonData.chapter == match[match.length - 1])
+                res.render('chapterView', { title: passage, theText: data, thePassage: passage });
+            else
+                onFailure();
+        }, function(error) {
+            onFailure();
         });
     }
-    else {
-        res.render('index', { title: passage });   
-    }
+    else
+        onFailure();
 });
 
 app.get('/', function(req, res) {
-    res.render('index', { title: 'Express' });   
+    res.render('index', { title: 'BibleNote.com' });   
 });
 
 http.createServer(app).listen(app.get('port'), function(){

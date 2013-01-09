@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  header
+    h1= title
+    #options
+      div
+        a#takeNotes Enter Note Mode
+      div
+        label
+          input#showVerseNumbers(type='checkbox', ng-model='showVerseNum')
+          | Show Verse Numbers
+  .row-fluid
+    #scripture.span6.offset3(ng-class="{noVerseNumbers: !showVerseNum}")
+      span.verse(ng-click="writeNote(todo)", ng-repeat="todo in todos", id="{{todo.verse}}")
+        span.verseNumber {{todo.verse}}
+        span.verseText(ng-bind-html="todo.text")
+  script
+    var theText = !{JSON.stringify(theText)};
+    var thePassage = '!{thePassage}';
+    document.getElementById('takeNotes').setAttribute('href', location.href + '/takeNotes/');

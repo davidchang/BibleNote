@@ -15,6 +15,8 @@ App.controller('TodoCtrl', function($scope, $http) {
 
     $scope.notes = [];
 
+    $scope.showVerseNum = true;
+
     $scope.writingFor = null;
 
     $scope.writeNote = function(todo){

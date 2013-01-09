@@ -4,7 +4,7 @@ var http = require('http'),
 var BibleApi =  {
     baseUrl: 'http://labs.bible.org/api/?type=json&passage=',
 
-    get: function(passage, callback) {
+    get: function(passage, success, failure) {
         var data = '';
         http.get(this.baseUrl + passage, function(res) {
             res.setEncoding = 'utf8';
@@ -12,11 +12,14 @@ var BibleApi =  {
                 data += chunk;
             });
             res.on('end', function() {
-                callback(data);
+                success(data);
             });
         })
         .on('error', function(error) {
-            callback(error);
+            console.log("error from calling BibleApi with " + passage);
+            console.log(error);
+            if(failure)
+                failure(error);
         });
     }
 }
