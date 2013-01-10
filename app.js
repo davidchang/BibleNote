@@ -28,13 +28,6 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-app.get('/get/:text', function(req, res) {
-    BibleAPI.get('Nahum 1', function(data) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(data);
-    });
-});
-
 String.prototype.capitalize = function(){
     return this.replace(/(^[a-z]|[ .,\(\)\[\]]+[a-z])/g, function(s) {
         return s.toUpperCase();
@@ -50,6 +43,17 @@ function getBookName(match) {
     name = trim(name).toLowerCase();
     return name;
 }
+
+app.post('/saveNotes/', function(req, res) {
+    var data = JSON.parse(req.body);
+    var notes = data.notes;
+    var passage = data.passage;
+
+    //now save in Redis
+
+    res.writeHead(200, { "Content-Type" : 'text/plain' });
+    res.end('thanks!');
+});
 
 app.get('/:text/takeNotes', function(req, res) {
     var text = req.params.text;

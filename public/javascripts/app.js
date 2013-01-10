@@ -23,6 +23,12 @@ App.controller('TodoCtrl', function($scope, $http) {
     $scope.verseSelected = false;
 
     $scope.writeNote = function(todo){
+        if(todo == $scope.writingFor) {
+            $scope.writingFor.writingNoteFor = false;
+            $scope.writingFor = null;
+            $scope.verseSelected = false;
+            return;
+        }
         if($scope.writingFor)
             $scope.writingFor.writingNoteFor = false;
 
@@ -31,23 +37,15 @@ App.controller('TodoCtrl', function($scope, $http) {
         todo.writingNoteFor = true;
 
         $(function() {
-            $('#note').focus();
+            $('#noteTextarea').focus();
             setTimeout(function() {
-                $('#note').focus();
+                $('#noteTextarea').focus();
             }, 10);
             /*
                 var p = $('#' + todo.verse).position();
                 $('#addNote').css('top', p.top).removeClass('hidden');
             */
         });
-    }
-
-    $scope.saveNote = function() {
-        $scope.notes.push({ verse: $scope.writingFor, note: $scope.note});
-        $scope.note = ""; $scope.writingFor = null;
-        $('#addNote').addClass('hidden');
-
-        fixNotes();
     }
 
     var fixNotes = function() {
@@ -57,5 +55,17 @@ App.controller('TodoCtrl', function($scope, $http) {
 
             $('#note' + verseNum).css('margin-top', y);
         }
+    }
+
+    $scope.saveNotes = function() {
+        var notes = _.compact(_.map($scope.todos, function(verse) {
+            if(verse.note)
+                return { verse : verse.verse, note: verse.note };
+        }));
+
+        $http.post('/saveNotes/', { notes: JSON.stringify(notes), passage: thePassage})
+            .then(function(res){
+                console.log(res);
+            });
     }
 });

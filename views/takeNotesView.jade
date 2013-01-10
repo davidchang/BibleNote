@@ -14,13 +14,18 @@ block content
         span.verseNumber {{todo.verse}}
         span.verseText(ng-bind-html="todo.text")
     #notes.span6
-      .row-fluid(ng-hide="verseSelected")
-        .span12 Select a verse to get started
-      .row-fluid(ng-show="verseSelected")
+      .row-fluid(ng-hide="writingFor")
+        .span12 Select a verse to take a note
+      .row-fluid(ng-show="writingFor")
         .span12 Writing a note for verse {{writingFor.verse}}:
         .span12
-          textarea#note(ng-model='note', ng-show='writingFor')
-          button.pull-right(ng-disabled='!note.length') Save Note
+          textarea#noteTextarea(ng-model='writingFor.note')
+      .row-fluid
+        .span12
+          | When you're done, click 
+          a(ng-click="saveNotes()") here
+          |  to save your notes
   script
     var theText = !{JSON.stringify(theText)};
     var thePassage = '!{thePassage}';
+  script(src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js')
