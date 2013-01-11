@@ -10,7 +10,7 @@ block content
           | Show Verse Numbers
   #takeNotes.row-fluid
     #scripture.span6(ng-class="{noVerseNumbers: !showVerseNum}")
-      span.verse(ng-click="writeNote(todo)", ng-repeat="todo in todos", id="{{todo.verse}}", ng-class="{highlight: todo.writingNoteFor}")
+      span.verse(ng-click="writeNote(todo)", ng-repeat="todo in todos", id="{{todo.verse}}", ng-class="{activeHighlight: todo.writingNoteFor, hasNoteHighlight: todo.note.length}")
         span.verseNumber {{todo.verse}}
         span.verseText(ng-bind-html="todo.text")
     #notes.span6
@@ -28,4 +28,6 @@ block content
   script
     var theText = !{JSON.stringify(theText)};
     var thePassage = '!{thePassage}';
+    var theNotes = !{JSON.stringify(theNotes)};
+    console.log(theNotes);
   script(src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js')

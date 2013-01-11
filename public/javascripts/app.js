@@ -17,22 +17,18 @@ App.controller('TodoCtrl', function($scope, $http) {
 
     //Options
     $scope.showVerseNum = true;
-    $scope.showVersesPerLine = false;
 
     $scope.writingFor = null;
-    $scope.verseSelected = false;
 
     $scope.writeNote = function(todo){
         if(todo == $scope.writingFor) {
             $scope.writingFor.writingNoteFor = false;
             $scope.writingFor = null;
-            $scope.verseSelected = false;
             return;
         }
         if($scope.writingFor)
             $scope.writingFor.writingNoteFor = false;
 
-        $scope.verseSelected = true;
         $scope.writingFor = todo;
         todo.writingNoteFor = true;
 

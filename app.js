@@ -1,13 +1,14 @@
-
-/**
- * Module dependencies.
- */
-
 var express = require('express')
   , http = require('http')
-  , path = require('path');
+  , path = require('path')
+  , BibleAPI = require('./BibleAPI.js')
+  , utils = require('./utils.js')
+  , redis = require('redis')
+  , client = redis.createClient();
 
-var BibleAPI = require('./BibleAPI.js');
+client.on('error', function(err) {
+    console.log('redis error ' + err);
+});
 
 var app = express();
 
@@ -28,31 +29,36 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-String.prototype.capitalize = function(){
-    return this.replace(/(^[a-z]|[ .,\(\)\[\]]+[a-z])/g, function(s) {
-        return s.toUpperCase();
-    });
-};
-
-function trim(word) {
-    return word.replace(/^\s+|\s+$/g, '').capitalize();
-}
-
-function getBookName(match) {
-    var name = match.slice(1, match.length - 1).join(' ');
-    name = trim(name).toLowerCase();
-    return name;
-}
-
 app.post('/saveNotes/', function(req, res) {
-    var data = JSON.parse(req.body);
+
+    var data = req.body; 
+    if(typeof req.body === 'string')
+        data = JSON.parse(req.body);
+
     var notes = data.notes;
     var passage = data.passage;
 
-    //now save in Redis
+    var user = 'user1';
 
-    res.writeHead(200, { "Content-Type" : 'text/plain' });
-    res.end('thanks!');
+    client.get(user, function(err, reply) {
+        var data = {};
+        if(reply) {
+            try {
+                data = JSON.parse(reply);
+            } catch(err) { }
+        }
+
+        data[passage] = notes;
+
+        console.log('going to write: ' + JSON.stringify(data));
+
+        //now save in Redis
+        client.set(user, JSON.stringify(data), function(err, reply) {
+            res.writeHead(200, { "Content-Type" : 'text/plain' });
+            res.end(reply);
+        });
+    });
+
 });
 
 app.get('/:text/takeNotes', function(req, res) {
@@ -65,11 +71,25 @@ app.get('/:text/takeNotes', function(req, res) {
     };
 
     if(match) {
-        var passage = trim(match.slice(1).join(' '));
+        var passage = utils.clean(match.slice(1).join(' '));
         BibleAPI.get(passage, function(data) {
             var jsonData = JSON.parse(data)[0];
-            if(data && data.length && jsonData.bookname.toLowerCase() == getBookName(match) && jsonData.chapter == match[match.length - 1])
-                res.render('takeNotesView', { title: passage, theText: data, thePassage: passage });
+            if(data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1]) {
+                //found the chapter
+
+                var user = 'user1';
+
+                client.get(user, function(err, reply) {
+                    var notes = {};
+                    if(reply) {
+                        try {
+                            notes = JSON.parse(reply);
+                            notes = notes[passage];
+                        } catch(err) { }
+                    }
+                    res.render('takeNotesView', { title: passage, theText: data, thePassage: passage, theNotes: notes });
+                });
+            }
             else
                 onFailure();
         }, function(error) {
@@ -90,10 +110,10 @@ app.get('/:text', function(req, res) {
     };
 
     if(match) {
-        var passage = trim(match.slice(1).join(' '));
+        var passage = utils.clean(match.slice(1).join(' '));
         BibleAPI.get(passage, function(data) {
             var jsonData = JSON.parse(data)[0];
-            if(data && data.length && jsonData.bookname.toLowerCase() == getBookName(match) && jsonData.chapter == match[match.length - 1])
+            if(data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1])
                 res.render('chapterView', { title: passage, theText: data, thePassage: passage });
             else
                 onFailure();

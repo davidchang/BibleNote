@@ -31,10 +31,10 @@ header #showVerseNumbers {
   cursor: pointer;
 }
 #takeNotes .verse:hover {
-  background-color: lightblue;
+  background-color: #A1CAF1;
 }
-#takeNotes .verse.highlight {
-  background-color: lightblue;
+#takeNotes .verse.activeHighlight {
+  background-color: #A1CAF1;
 }
 .verseNumber {
   margin-right: 3px;
