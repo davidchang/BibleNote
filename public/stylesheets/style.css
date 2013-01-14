@@ -18,6 +18,7 @@ header #showVerseNumbers {
 #notes {
   margin-top: 10px;
   margin-bottom: 40px;
+  margin-right: -2px;
 }
 .verse {
   margin: 0px 3px;

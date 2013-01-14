@@ -12,7 +12,7 @@ block content
           | Show Verse Numbers
   .row-fluid
     #scripture.span6.offset3(ng-class="{noVerseNumbers: !showVerseNum}")
-      span.verse(ng-repeat="todo in todos", id="{{todo.verse}}")
+      span.verse(ng-repeat="todo in verses", id="{{todo.verse}}")
         span.verseNumber {{todo.verse}}
         span.verseText(ng-bind-html="todo.text")
   script

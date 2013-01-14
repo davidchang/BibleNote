@@ -1,27 +1,25 @@
 var App = angular.module('App', ['ngSanitize']);
 
-App.controller('TodoCtrl', function($scope, $http) {
-    $scope.todos = [];
-
-    if(theText) {
-        $scope.todos = JSON.parse(theText);
-    }
-    else {
-        $http.get('/get/' + thePassage)
-            .then(function(res){
-                $scope.todos = res.data;
+App.controller('BibleNoteCtrl', function($scope, $http) {
+    //Data
+    $scope.verses = JSON.parse(theText);
+    if(theNotes) {
+        var notesJSON = JSON.parse(theNotes);
+        for(var i = 0; i < notesJSON.length; ++i) {
+            var matchingVerse = _.find($scope.verses, function(x) {
+                return x.verse == notesJSON[i].verse;
             });
+            matchingVerse.note = notesJSON[i].note;
+        }
     }
-
-    $scope.notes = [];
 
     //Options
     $scope.showVerseNum = true;
 
     $scope.writingFor = null;
 
-    $scope.writeNote = function(todo){
-        if(todo == $scope.writingFor) {
+    $scope.writeNote = function(verse){
+        if(verse == $scope.writingFor) {
             $scope.writingFor.writingNoteFor = false;
             $scope.writingFor = null;
             return;
@@ -29,8 +27,8 @@ App.controller('TodoCtrl', function($scope, $http) {
         if($scope.writingFor)
             $scope.writingFor.writingNoteFor = false;
 
-        $scope.writingFor = todo;
-        todo.writingNoteFor = true;
+        $scope.writingFor = verse;
+        verse.writingNoteFor = true;
 
         $(function() {
             $('#noteTextarea').focus();
@@ -44,24 +42,20 @@ App.controller('TodoCtrl', function($scope, $http) {
         });
     }
 
-    var fixNotes = function() {
-        for(var i = 0; i < $scope.notes.length; ++i) {
-            var verseNum = $scope.notes[i].verse;
-            var y = $('#' + verseNum).position().top;
-
-            $('#note' + verseNum).css('margin-top', y);
-        }
-    }
-
     $scope.saveNotes = function() {
-        var notes = _.compact(_.map($scope.todos, function(verse) {
+        var notes = _.compact(_.map($scope.verses, function(verse) {
             if(verse.note)
                 return { verse : verse.verse, note: verse.note };
         }));
 
         $http.post('/saveNotes/', { notes: JSON.stringify(notes), passage: thePassage})
             .then(function(res){
-                console.log(res);
+                if(res.data == 'OK') {
+                    $scope.notesLink = 'http://biblenote.heroku-app.com/';
+                    $(function() {
+                        $('#linkSaved').show()
+                    });
+                }
             });
     }
 });
