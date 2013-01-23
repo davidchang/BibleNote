@@ -4,11 +4,48 @@ var express = require('express')
   , BibleAPI = require('./BibleAPI.js')
   , utils = require('./utils.js')
   , redis = require('redis')
-  , client = redis.createClient();
+  , client = redis.createClient()
+  , passport = require('passport');
 
 client.on('error', function(err) {
     console.log('redis error ' + err);
 });
+
+/* singly */
+var SinglyStrategy = require('passport-singly').Strategy;
+
+var SINGLY_APP_ID = process.env.SINGLY_APP_ID || "f405c5fdcb0b59c4515883ad700b1836";
+var SINGLY_APP_SECRET = process.env.SINGLY_APP_SECRET || "a2713e559a9f70827066711ebaff0960";
+
+var CALLBACK_URL = process.env.CALLBACK_URL || "http://localhost:3000/auth/singly/callback";
+
+passport.serializeUser(function (user, done) {
+      done(null, user);
+});
+
+passport.deserializeUser(function (obj, done) {
+      done(null, obj);
+});
+
+function ensureAuthenticated(req, res, next) {
+      if (req.isAuthenticated())
+          return next();
+
+      res.redirect('/login');
+}
+
+passport.use(new SinglyStrategy({
+    clientID: SINGLY_APP_ID,
+    clientSecret: SINGLY_APP_SECRET,
+    callbackURL: CALLBACK_URL
+  },
+  function (accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+      return done(null, profile);
+    });
+  }
+));
+/* singly */
 
 var app = express();
 
@@ -18,8 +55,12 @@ app.configure(function(){
   app.set('view engine', 'jade');
   app.use(express.favicon());
   app.use(express.logger('dev'));
+  app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+  app.use(express.session({ secret: 'keyboard cat' }));
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -27,6 +68,22 @@ app.configure(function(){
 
 app.configure('development', function(){
   app.use(express.errorHandler());
+});
+
+app.get('/login', function(req, res) {
+    res.render('login', {user: req.user, title: 'BibleNote | Login'});
+});
+
+app.get('/auth/singly/callback', passport.authenticate('singly', {
+    failureRedirect: '/login',
+    successReturnToOrRedirect: '/'
+}));
+
+app.get('/auth/singly/:service', passport.authenticate('singly'));
+
+app.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/');
 });
 
 app.post('/saveNotes/', function(req, res) {
@@ -61,7 +118,7 @@ app.post('/saveNotes/', function(req, res) {
 
 });
 
-app.get('/:text/takeNotes', function(req, res) {
+function renderPassageAndNotes(req, res, viewToShow) {
     var text = req.params.text;
     var passageRegex = /^([0-9]*)([a-zA-Z]+)([0-9]+)$/;
     var match = passageRegex.exec(text);
@@ -87,7 +144,7 @@ app.get('/:text/takeNotes', function(req, res) {
                             notes = notes[passage];
                         } catch(err) { }
                     }
-                    res.render('takeNotesView', { title: passage, theText: data, thePassage: passage, theNotes: notes });
+                    res.render(viewToShow, { title: passage, theText: data, thePassage: passage, theNotes: notes });
                 });
             }
             else
@@ -98,6 +155,14 @@ app.get('/:text/takeNotes', function(req, res) {
     }
     else
         onFailure();
+}
+
+app.get('/:text/takeNotes', function(req, res) {
+    renderPassageAndNotes(req, res, 'takeNotesView');
+});
+
+app.get(/[0-9]*[a-zA-Z]+[0-9]+\/(.+)/, function(req, res) {
+    renderPassageAndNotes(req, res, 'viewNotesView');
 });
 
 app.get('/:text', function(req, res) {
@@ -126,7 +191,8 @@ app.get('/:text', function(req, res) {
 });
 
 app.get('/', function(req, res) {
-    res.render('index', { title: 'BibleNote.com' });   
+    console.log(req.user);
+    res.render('index', { title: 'BibleNote.com', user: req.user });   
 });
 
 http.createServer(app).listen(app.get('port'), function(){

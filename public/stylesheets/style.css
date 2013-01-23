@@ -1,10 +1,10 @@
-header {
+#bookHeader {
   text-align: center;
 }
-header:first-letter {
+#bookHeader:first-letter {
   text-transform: uppercase;
 }
-header #showVerseNumbers {
+#bookHeader #showVerseNumbers {
   vertical-align: top;
   margin-right: 5px;
 }
@@ -52,8 +52,26 @@ body {
   background-color: #FFF;
   color: #333;
 }
-#wrapper {
+.wrapper {
   width: 80%;
   max-width: 960px;
   margin: 0 auto;
+}
+#header {
+  background-color: #0088cc;
+  min-height: 30px;
+  margin-bottom: 20px;
+}
+#header #title {
+  font-size: 2.5em;
+  margin: 15px 0px;
+}
+#header #account {
+  margin-top: 15px;
+}
+#header a {
+  color: white;
+}
+.clear {
+  clear: both;
 }

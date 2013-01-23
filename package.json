@@ -9,7 +9,9 @@
     "express": "3.0.5",
     "jade": "*",
     "less-middleware": "*",
-    "connect-redis": "*"
+    "connect-redis": "*",
+    "passport": "*",
+    "passport-singly": "*"
   },
   "engines": {
     "node": "0.8.x",

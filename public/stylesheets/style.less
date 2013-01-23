@@ -1,4 +1,4 @@
-header {
+#bookHeader {
     text-align: center;
     &:first-letter {
         text-transform: uppercase;
@@ -57,8 +57,26 @@ body {
     background-color: #FFF;
     color: #333;
 }
-#wrapper {
+.wrapper {
     width: 80%;
     max-width: 960px;
     margin: 0 auto;
+}
+#header {
+    background-color: rgb(0, 136, 204);
+    min-height: 30px;
+    margin-bottom: 20px;
+    #title {
+        font-size: 2.5em;
+        margin: 15px 0px;
+    }
+    #account {
+        margin-top: 15px;
+    }
+    a {
+        color: white;
+    }
+}
+.clear {
+    clear: both;
 }
