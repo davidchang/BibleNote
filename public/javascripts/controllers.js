@@ -1,8 +1,13 @@
 'use strict';
 
-App.controller('BibleNoteCtrl', ['$scope', '$http', function($scope, $http) {
+App.controller('BibleNoteCtrl', ['$scope', '$http', 'Bible', function($scope, $http, Bible) {
     //Data
 
+    Bible.getText(thePassage, function(json) {
+        $scope.verses = JSON.parse(json.data.theText);
+    });
+
+/*
     if(theText) {
         $scope.verses = JSON.parse(theText);
         if(theNotes) {
@@ -17,6 +22,7 @@ App.controller('BibleNoteCtrl', ['$scope', '$http', function($scope, $http) {
     }
     else
         $scope.verses = [];
+        */
  
     //Options
     $scope.showVerseNum = true;

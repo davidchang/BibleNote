@@ -129,7 +129,10 @@ function renderPassageAndNotes(req, res, viewToShow) {
 
     if(match) {
         var passage = utils.clean(match.slice(1).join(' '));
-        BibleAPI.get(passage, function(data) {
+        BibleAPI.get(passage, function(error, data) {
+            if(error)
+                onFailure();
+
             var jsonData = JSON.parse(data)[0];
             if(data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1]) {
                 //found the chapter
@@ -147,22 +150,38 @@ function renderPassageAndNotes(req, res, viewToShow) {
                     res.render(viewToShow, { title: passage, theText: data, thePassage: passage, theNotes: notes });
                 });
             }
-            else
-                onFailure();
-        }, function(error) {
-            onFailure();
         });
     }
-    else
-        onFailure();
+
+    onFailure();
 }
 
 app.get('/:text/takeNotes', function(req, res) {
     renderPassageAndNotes(req, res, 'takeNotesView');
 });
 
-app.get(/[0-9]*[a-zA-Z]+[0-9]+\/(.+)/, function(req, res) {
-    renderPassageAndNotes(req, res, 'viewNotesView');
+app.get('/get/:text', function(req, res) {
+    var text = req.params.text;
+    var passageRegex = /^([0-9]*)([a-zA-Z]+)([0-9]+)$/;
+    var match = passageRegex.exec(text);
+
+    res.writeHead(200, {"Content-Type": "application/json"});
+
+    if(match) {
+        var passage = utils.clean(match.slice(1).join(' '));
+        BibleAPI.get(passage, function(error, data) {
+            if(error)
+                res.end("{}");
+
+            var jsonData = JSON.parse(data)[0];
+            if(data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1])
+                res.end(JSON.stringify({ theText: data, thePassage: passage }));
+            else
+                res.end("{}");
+        });
+    }
+    else
+        res.end("{}");
 });
 
 app.get('/:text', function(req, res) {
@@ -176,15 +195,7 @@ app.get('/:text', function(req, res) {
 
     if(match) {
         var passage = utils.clean(match.slice(1).join(' '));
-        BibleAPI.get(passage, function(data) {
-            var jsonData = JSON.parse(data)[0];
-            if(data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1])
-                res.render('chapterView', { title: passage, theText: data, thePassage: passage });
-            else
-                onFailure();
-        }, function(error) {
-            onFailure();
-        });
+        res.render('chapterView', { title: passage });
     }
     else
         onFailure();
