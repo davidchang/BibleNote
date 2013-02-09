@@ -12,9 +12,11 @@ block content
           | Show Verse Numbers
   .row-fluid
     #scripture.span6.offset3(ng-class="{noVerseNumbers: !showVerseNum}")
-      span.verse(ng-repeat="todo in verses", id="{{todo.verse}}")
-        span.verseNumber {{todo.verse}}
-        span.verseText(ng-bind-html="todo.text")
+      span.verse(ng-repeat="verse in verses", id="{{verse.verse}}")
+        span.verseNumber {{verse.verse}}
+        span.verseText(ng-bind-html="verse.text")
+    #loading(ng-show="!verses.length")
+      Loading...
   script
     var thePassage = '!{title}';
     document.getElementById('takeNotes').setAttribute('href', location.href + '/takeNotes/');

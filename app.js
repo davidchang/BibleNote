@@ -3,6 +3,7 @@ var express = require('express')
   , path = require('path')
   , BibleAPI = require('./BibleAPI.js')
   , utils = require('./utils.js')
+  , _ = require('underscore')
   , redis = require('redis')
   , client = redis.createClient()
   , passport = require('passport');
@@ -118,48 +119,6 @@ app.post('/saveNotes/', function(req, res) {
 
 });
 
-function renderPassageAndNotes(req, res, viewToShow) {
-    var text = req.params.text;
-    var passageRegex = /^([0-9]*)([a-zA-Z]+)([0-9]+)$/;
-    var match = passageRegex.exec(text);
-
-    var onFailure = function() {
-        res.redirect('/');
-    };
-
-    if(match) {
-        var passage = utils.clean(match.slice(1).join(' '));
-        BibleAPI.get(passage, function(error, data) {
-            if(error)
-                onFailure();
-
-            var jsonData = JSON.parse(data)[0];
-            if(data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1]) {
-                //found the chapter
-
-                var user = 'user1';
-
-                client.get(user, function(err, reply) {
-                    var notes = {};
-                    if(reply) {
-                        try {
-                            notes = JSON.parse(reply);
-                            notes = notes[passage];
-                        } catch(err) { }
-                    }
-                    res.render(viewToShow, { title: passage, theText: data, thePassage: passage, theNotes: notes });
-                });
-            }
-        });
-    }
-
-    onFailure();
-}
-
-app.get('/:text/takeNotes', function(req, res) {
-    renderPassageAndNotes(req, res, 'takeNotesView');
-});
-
 app.get('/get/:text', function(req, res) {
     var text = req.params.text;
     var passageRegex = /^([0-9]*)([a-zA-Z]+)([0-9]+)$/;
@@ -174,8 +133,30 @@ app.get('/get/:text', function(req, res) {
                 res.end("{}");
 
             var jsonData = JSON.parse(data)[0];
-            if(data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1])
-                res.end(JSON.stringify({ theText: data, thePassage: passage }));
+            if(data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1]) {
+                //found Bible passage, now find the notes
+                var user = 'user1';
+
+                client.get(user, function(err, reply) {
+                    var notes = {};
+                    if(reply) {
+                        try {
+                            notes = JSON.parse(reply);
+                            notes = notes[passage];
+                        } catch(err) { }
+                    }
+
+                    data = JSON.parse(data);
+                    notes = JSON.parse(notes);
+
+                    for(var i = 0, len = notes.length; i < len; ++i) {
+                        if(data[notes[i].verse - 1])
+                            data[notes[i].verse - 1].note = notes[i].note;
+                    }
+
+                    res.end(JSON.stringify({ theText: data, thePassage: passage }));
+                });
+            }
             else
                 res.end("{}");
         });
@@ -184,7 +165,7 @@ app.get('/get/:text', function(req, res) {
         res.end("{}");
 });
 
-app.get('/:text', function(req, res) {
+function render(req, res, view) {
     var text = req.params.text;
     var passageRegex = /^([0-9]*)([a-zA-Z]+)([0-9]+)$/;
     var match = passageRegex.exec(text);
@@ -195,10 +176,18 @@ app.get('/:text', function(req, res) {
 
     if(match) {
         var passage = utils.clean(match.slice(1).join(' '));
-        res.render('chapterView', { title: passage });
+        res.render(view, { title: passage });
     }
     else
         onFailure();
+}
+
+app.get('/:text/takeNotes', function(req, res) {
+    render(req, res, 'takeNotesView');
+});
+
+app.get('/:text', function(req, res) {
+    render(req, res, 'chapterView');
 });
 
 app.get('/', function(req, res) {

@@ -3,27 +3,10 @@
 App.controller('BibleNoteCtrl', ['$scope', '$http', 'Bible', function($scope, $http, Bible) {
     //Data
 
-    Bible.getText(thePassage, function(json) {
-        $scope.verses = JSON.parse(json.data.theText);
+    Bible.getText(thePassage, notes, function(json) {
+        $scope.verses = json.data.theText;
     });
 
-/*
-    if(theText) {
-        $scope.verses = JSON.parse(theText);
-        if(theNotes) {
-            var notesJSON = JSON.parse(theNotes);
-            for(var i = 0; i < notesJSON.length; ++i) {
-                var matchingVerse = _.find($scope.verses, function(x) {
-                    return x.verse == notesJSON[i].verse;
-                });
-                matchingVerse.note = notesJSON[i].note;
-            }
-        }
-    }
-    else
-        $scope.verses = [];
-        */
- 
     //Options
     $scope.showVerseNum = true;
 

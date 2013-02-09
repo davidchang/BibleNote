@@ -16,7 +16,9 @@ html(ng-app="App", lang="en")
       block content
     script(src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.1.1/angular.min.js')
     script(src='/javascripts/angular-sanitize.js')
-    script(src='/javascripts/jquery.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js')
     script(src='/javascripts/app.js')
+    script
+      if(!notes) var notes = false;
     script(src='/javascripts/controllers.js')
     script(src='/javascripts/services.js')

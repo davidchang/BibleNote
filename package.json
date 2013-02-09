@@ -11,7 +11,8 @@
     "less-middleware": "*",
     "connect-redis": "*",
     "passport": "*",
-    "passport-singly": "*"
+    "passport-singly": "*",
+    "underscore": "*"
   },
   "engines": {
     "node": "0.8.x",

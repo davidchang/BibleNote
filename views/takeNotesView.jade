@@ -30,8 +30,5 @@ block content
           | High five! Your notes can be viewed at 
           a(href='{{notesLink}}') {{notesLink}}
   script
-    var theText = !{JSON.stringify(theText)};
-    var thePassage = '!{thePassage}';
-    if(!{theNotes})
-        var theNotes = !{JSON.stringify(theNotes)};
-  script(src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js')
+    var thePassage = '!{title}';
+    var notes = true;

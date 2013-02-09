@@ -1,7 +1,19 @@
-extends layout
-
-block content
-  header
-    h1= title
-  .row-fluid
-    .span12 This is the index page
+doctype 5
+html(ng-app="App", lang="en")
+  head
+    title= title
+    link(rel='stylesheet', href='//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body(ng-controller="BibleNoteCtrl")
+    header#header
+      .wrapper
+        #title.pull-left
+          a(href='/') BibleNote.com
+        #account.pull-right
+          a(href='/login') Log in
+        .clear
+    .wrapper
+      header
+        h1= title
+      .row-fluid
+        .span12 This is the index page
