@@ -1,8 +1,7 @@
 'use strict';
 
-App.controller('BibleNoteCtrl', ['$scope', '$http', 'Bible', function($scope, $http, Bible) {
+App.controller('BibleNoteCtrl', ['$scope', 'Bible', function($scope, Bible) {
     //Data
-
     Bible.getText(thePassage, notes, function(json) {
         $scope.verses = json.data.theText;
     });
@@ -38,15 +37,15 @@ App.controller('BibleNoteCtrl', ['$scope', '$http', 'Bible', function($scope, $h
                 return { verse : verse.verse, note: verse.note };
         }));
 
-        $http.post('/saveNotes/', { notes: JSON.stringify(notes), passage: thePassage})
-            .then(function(res){
-                if(res.data == 'OK') {
-                    $scope.notesLink = 'http://biblenote.heroku-app.com/';
-                    $(function() {
-                        $('#linkSaved').show()
-                    });
-                }
+        Bible.saveNotes(JSON.stringify(notes, thePassage, function(error, res) {
+            if(error)
+                console.warn(error);
+
+            $scope.notesLink = 'http://biblenote.heroku-app.com/';
+            $(function() {
+                $('#linkSaved').show()
             });
+        });
     }
 }]);
 

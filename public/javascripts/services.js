@@ -8,5 +8,12 @@ App.service('Bible', ['$http', function($http) {
                 callback(res);
             });
     }
+
+    this.saveNotes = function(notes, chapter, callback) {
+        $http.post('/saveNotes/', { notes: JSON.stringify(notes), passage: chapter})
+            .then(function(res){
+                callback(res.data !== 'OK', res);
+            });
+    });
 }
 ]);
