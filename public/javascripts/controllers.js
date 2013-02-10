@@ -8,6 +8,7 @@ App.controller('BibleNoteCtrl', ['$scope', 'Bible', function($scope, Bible) {
 
     //Options
     $scope.showVerseNum = true;
+    $scope.verseGetsOwnLine = false;
 
     $scope.writingFor = null;
 
@@ -37,13 +38,17 @@ App.controller('BibleNoteCtrl', ['$scope', 'Bible', function($scope, Bible) {
                 return { verse : verse.verse, note: verse.note };
         }));
 
-        Bible.saveNotes(JSON.stringify(notes, thePassage, function(error, res) {
+        Bible.saveNotes(JSON.stringify(notes), thePassage, function(error, res) {
             if(error)
-                console.warn(error);
+                return;
 
             $scope.notesLink = 'http://biblenote.heroku-app.com/';
             $(function() {
-                $('#linkSaved').show()
+                $('#linkSaved').removeClass('hidden');
+                $('#closeAlertButton').click(function() {
+                    $('#linkSaved').addClass('hidden');
+                    $(this).off('click');
+                });
             });
         });
     }

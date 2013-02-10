@@ -14,6 +14,6 @@ App.service('Bible', ['$http', function($http) {
             .then(function(res){
                 callback(res.data !== 'OK', res);
             });
-    });
+    };
 }
 ]);

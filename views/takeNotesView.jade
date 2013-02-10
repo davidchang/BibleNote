@@ -6,29 +6,35 @@ block content
     #options
       div
         label
-          input#showVerseNumbers(type='checkbox', ng-model='showVerseNum')
+          input.optionCheckbox(type='checkbox', ng-model='showVerseNum')
           | Show Verse Numbers
-  #takeNotes.row-fluid
-    #scripture.span6(ng-class="{noVerseNumbers: !showVerseNum}")
-      span.verse(ng-click="writeNote(todo)", ng-repeat="todo in verses", id="{{todo.verse}}", ng-class="{activeHighlight: todo.writingNoteFor, hasNoteHighlight: todo.note.length}")
-        span.verseNumber {{todo.verse}}
-        span.verseText(ng-bind-html="todo.text")
-    #notes.span6
-      .row-fluid(ng-hide="writingFor")
-        .span12 Select a verse to take a note
-      .row-fluid(ng-show="writingFor")
-        .span12 Writing a note for verse {{writingFor.verse}}:
+      div
+        label
+          input.optionCheckbox(type='checkbox', ng-model='verseGetsOwnLine')
+          | Each Verse Gets Its Own Line
+  .takeNotes.row-fluid
+    .span12
+      .row-fluid
+        .span12(ng-hide='writingFor') Take notes on the general chapter, or select a verse to take a specific note:
+        .span12.noMarginLeft(ng-show='writingFor') Writing a note for verse {{writingFor.verse}}:
+      .row-fluid
         .span12
-          textarea#noteTextarea(ng-model='writingFor.note')
+          textarea#noteTextArea(ng-model='writingFor.note')
       .row-fluid
         .span12
           | When you're done, click 
           a(ng-click="saveNotes()") here
           |  to save your notes
-        #linkSaved.span12.alert.alert-success.hidden
-          button.close(type='button', data-dismiss='alert') x
+        #linkSaved.span12.alert.alert-success.hidden.noMarginLeft
+          button.close#closeAlertButton(type='button') x
           | High five! Your notes can be viewed at 
           a(href='{{notesLink}}') {{notesLink}}
+  .takeNotes.row-fluid
+    #scripture.span8(ng-class="{noVerseNumbers: !showVerseNum}")
+      span.verse(ng-click="writeNote(todo)", ng-repeat="todo in verses", id="{{todo.verse}}", ng-class="{activeHighlight: todo.writingNoteFor, hasNoteHighlight: todo.note.length, ownLine: verseGetsOwnLine}")
+        span.verseNumber {{todo.verse}}
+        span.verseText(ng-bind-html="todo.text")
+    #notes.span3
   script
     var thePassage = '!{title}';
     var notes = true;
