@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  form#sermonData
+    fieldset
+      div
+        label.inline.formLabel Title:
+        input#sermonTitle(type='text', required)
+      div
+        label.inline.formLabel Speaker:
+        input#sermonSpeaker(type='text', required)
+  .row-fluid.takeNotes
+    .span12
+      textarea#noteTextArea(ng-model='writingFor.note')

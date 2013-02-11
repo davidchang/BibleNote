@@ -8,7 +8,7 @@ block content
         a#takeNotes Enter Note Mode
       div
         label
-          input#showVerseNumbers(type='checkbox', ng-model='showVerseNum')
+          input.optionCheckbox(type='checkbox', ng-model='showVerseNum')
           | Show Verse Numbers
   .row-fluid
     #scripture.span6.offset3(ng-class="{noVerseNumbers: !showVerseNum}")

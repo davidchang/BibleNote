@@ -77,3 +77,9 @@ body {
 .noMarginLeft {
   margin-left: 0px !important;
 }
+.inline {
+  display: inline !important;
+}
+.marginRight {
+  margin-right: 10px;
+}

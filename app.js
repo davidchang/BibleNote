@@ -120,9 +120,7 @@ app.post('/saveNotes/', function(req, res) {
 });
 
 app.get('/get/:text', function(req, res) {
-    var text = req.params.text;
-    var passageRegex = /^([0-9]*)([a-zA-Z]+)([0-9]+)$/;
-    var match = passageRegex.exec(text);
+    var match = utils.findScriptureMatch(req.params.text);
 
     res.writeHead(200, {"Content-Type": "application/json"});
 
@@ -165,29 +163,17 @@ app.get('/get/:text', function(req, res) {
         res.end("{}");
 });
 
-function render(req, res, view) {
-    var text = req.params.text;
-    var passageRegex = /^([0-9]*)([a-zA-Z]+)([0-9]+)$/;
-    var match = passageRegex.exec(text);
-
-    var onFailure = function() {
-        res.redirect('/');
-    };
-
-    if(match) {
-        var passage = utils.clean(match.slice(1).join(' '));
-        res.render(view, { title: passage });
-    }
-    else
-        onFailure();
-}
+app.get('/takeSermonNotes', function(req, res) {
+    console.log(req.user);
+    res.render('takeSermonNotesView', { title: 'BibleNote.com', user: req.user });   
+});
 
 app.get('/:text/takeNotes', function(req, res) {
-    render(req, res, 'takeNotesView');
+    utils.render(req, res, 'takeNotesView');
 });
 
 app.get('/:text', function(req, res) {
-    render(req, res, 'chapterView');
+    utils.render(req, res, 'chapterView');
 });
 
 app.get('/', function(req, res) {
