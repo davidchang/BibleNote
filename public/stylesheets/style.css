@@ -80,6 +80,7 @@ body {
 .inline {
   display: inline !important;
 }
-.marginRight {
+.formLabel {
   margin-right: 10px;
+  vertical-align: text-bottom;
 }

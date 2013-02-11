@@ -21,5 +21,6 @@ html(ng-app="App", lang="en")
     script(src='/javascripts/app.js')
     script
       if(!notes) var notes = false;
-    script(src='/javascripts/controllers.js')
+    block controllerScript
+      script(src='/javascripts/controllers.js')
     script(src='/javascripts/services.js')

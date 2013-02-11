@@ -4,11 +4,18 @@ block content
   form#sermonData
     fieldset
       div
-        label.inline.formLabel Title:
-        input#sermonTitle(type='text', required)
+        input#sermonTitle(type='text', placeholder='Title', required)
       div
-        label.inline.formLabel Speaker:
-        input#sermonSpeaker(type='text', required)
-  .row-fluid.takeNotes
-    .span12
-      textarea#noteTextArea(ng-model='writingFor.note')
+        input#sermonSpeaker(type='text', placeholder='Speaker', required)
+      .takeNotes
+        textarea#noteTextArea(ng-model='currentNote', placeholder='Take Notes Here...')
+      div
+        button.btn(ng-click='saveNote()') Save Note
+  .row-fluid#showNotes
+    .span12(ng-show="notes.length")
+      .note(ng-repeat="note in notes", id="note{{note.id}}")
+        span {{note.text}}
+    .span12.noMarginLeft(ng-hide="notes.length") Notes will appear here
+
+block controllerScript
+  script(src='/javascripts/sermonNoteController.js')
