@@ -15,5 +15,12 @@ App.service('Bible', ['$http', function($http) {
                 callback(res.data !== 'OK', res);
             });
     };
+
+    this.saveSermonNotes = function(notesObject, callback) {
+        $http.post('/saveSermonNotes/', { notes: JSON.stringify(notesObject) })
+            .then(function(res) {
+                callback(res.data !== 'OK', res);
+            });
+    }
 }
 ]);

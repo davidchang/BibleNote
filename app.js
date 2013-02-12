@@ -88,7 +88,6 @@ app.get('/logout', function(req, res) {
 });
 
 app.post('/saveNotes/', function(req, res) {
-
     var data = req.body; 
     if(typeof req.body === 'string')
         data = JSON.parse(req.body);
@@ -106,6 +105,7 @@ app.post('/saveNotes/', function(req, res) {
             } catch(err) { }
         }
 
+        //overwrite whatever had been there
         data[passage] = notes;
 
         console.log('going to write: ' + JSON.stringify(data));
@@ -116,7 +116,38 @@ app.post('/saveNotes/', function(req, res) {
             res.end(reply);
         });
     });
+});
 
+app.post('/saveSermonNotes/', function(req, res) {
+    var data = req.body; 
+    if(typeof req.body === 'string')
+        data = JSON.parse(req.body);
+
+    console.log(data);
+
+    var user = 'user2';
+
+    client.get(user, function(err, reply) {
+        var dbData = {};
+        if(reply) {
+            try {
+                dbData = JSON.parse(reply);
+            } catch(err) { }
+        }
+
+        if(!dbData['sermons'])
+            dbData['sermons'] = {};
+        else {
+            if(data.oldTitle)
+                delete dbData['sermons'][data.oldTitle];
+        }
+
+        dbData['sermons'][data.title] = data;
+        client.set(user, JSON.stringify(dbData), function(err, reply) {
+            res.writeHead(200, { "Content-Type" : 'text/plain' });
+            res.end(reply);
+        });
+    });
 });
 
 app.get('/get/:text', function(req, res) {

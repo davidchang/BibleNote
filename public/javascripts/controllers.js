@@ -25,9 +25,9 @@ App.controller('BibleNoteCtrl', ['$scope', 'Bible', function($scope, Bible) {
         verse.writingNoteFor = true;
 
         $(function() {
-            $('#noteTextarea').focus();
+            $('#noteTextArea').focus();
             setTimeout(function() {
-                $('#noteTextarea').focus();
+                $('#noteTextArea').focus();
             }, 10);
         });
     }
