@@ -1,6 +1,25 @@
 var http = require('http'),
     qs = require('querystring');
 
+var utils = {
+    clean: function(word) {
+        var trimmed = word.replace(/^\s+|\s+$/g, '');
+        return trimmed.replace(/(^[a-z]|[ .,\(\)\[\]]+[a-z])/g, function(s) {
+            return s.toUpperCase();
+        });
+    },
+    getBookName: function(match) {
+        var name = match.slice(1, match.length - 1).join(' ');
+        name = this.clean(name).toLowerCase();
+        return name;
+    },
+
+    findScriptureMatch: function(text) {
+        var passageRegex = /^([0-9]*)\s*([a-zA-Z]+)\s*([0-9]+).*$/;
+        return passageRegex.exec(text);
+    }
+};
+
 var BibleApi =  {
     baseUrl: 'http://labs.bible.org/api/?type=json&passage=',
 
@@ -12,7 +31,20 @@ var BibleApi =  {
                 data += chunk;
             });
             res.on('end', function() {
-                callback(null, data);
+                var match = utils.findScriptureMatch(passage);
+                if(match) {
+                    var jsonData = null;
+                    try {
+                        jsonData = JSON.parse(data)[0];
+                    } catch(err) { console.log(err); }
+
+                    if(jsonData && data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1]) {
+                        callback(null, JSON.parse(data));
+                        return;
+                    }
+                }
+
+                callback("error retrieving " + passage + "... does it exist?");
             });
         })
         .on('error', function(error) {

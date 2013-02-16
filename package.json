@@ -1,5 +1,10 @@
 {
-  "name": "application-name",
+  "name": "BibleNote",
+  "author": "David chang <dchang.me@gmail.com>",
+  "homepage": "http://github.com/davidchang/BibleNote",
+  "bugs": {
+      "url": "http://github.com/davidchang/BibleNote/issues"
+  },
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -12,7 +17,11 @@
     "connect-redis": "*",
     "passport": "*",
     "passport-singly": "*",
-    "underscore": "*"
+    "underscore": "*",
+    "mongodb": "*"
+  },
+  "devDependencies": {
+    "vows": "0.7.0"
   },
   "engines": {
     "node": "0.8.x",
