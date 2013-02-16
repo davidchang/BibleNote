@@ -156,13 +156,9 @@ app.get('/get/:text', function(req, res) {
     res.writeHead(200, {"Content-Type": "application/json"});
 
     if(match) {
-        var passage = utils.clean(match.slice(1).join(' '));
-        BibleAPI.get(passage, function(error, data) {
-            if(error)
-                res.end("{}");
-
-            var jsonData = JSON.parse(data)[0];
-            if(data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1]) {
+        var passage = utils.cleanPassageTitle(match.slice(1).join(' '));
+        BibleAPI.get(passage)
+            .then(function(data) {
                 //found Bible passage, now find the notes
                 var user = 'user1';
 
@@ -175,7 +171,6 @@ app.get('/get/:text', function(req, res) {
                         } catch(err) { }
                     }
 
-                    data = JSON.parse(data);
                     notes = JSON.parse(notes);
 
                     for(var i = 0, len = notes.length; i < len; ++i) {
@@ -185,10 +180,10 @@ app.get('/get/:text', function(req, res) {
 
                     res.end(JSON.stringify({ theText: data, thePassage: passage }));
                 });
-            }
-            else
+            }, function(error) {
                 res.end("{}");
-        });
+            }
+        );
     }
     else
         res.end("{}");

@@ -1,15 +1,9 @@
 var utils = {
-    clean: function(word) {
+    cleanPassageTitle: function(word) {
         var trimmed = word.replace(/^\s+|\s+$/g, '');
         return trimmed.replace(/(^[a-z]|[ .,\(\)\[\]]+[a-z])/g, function(s) {
             return s.toUpperCase();
         });
-    },
-
-    getBookName: function(match) {
-        var name = match.slice(1, match.length - 1).join(' ');
-        name = this.clean(name).toLowerCase();
-        return name;
     },
 
     findScriptureMatch: function(text) {
@@ -25,7 +19,7 @@ var utils = {
         };
 
         if(match) {
-            var passage = utils.clean(match.slice(1).join(' '));
+            var passage = this.cleanPassageTitle(match.slice(1).join(' '));
             res.render(view, { title: passage });
         }
         else
