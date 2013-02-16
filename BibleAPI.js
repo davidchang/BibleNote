@@ -1,5 +1,6 @@
 var http = require('http'),
-    qs = require('querystring');
+    qs = require('querystring'),
+    Q = require('q');
 
 var utils = {
     clean: function(word) {
@@ -25,13 +26,15 @@ var BibleApi =  {
 
     get: function(passage, callback) {
         var data = '';
+        var d = Q.defer();
+
         http.get(this.baseUrl + passage, function(res) {
             res.setEncoding = 'utf8';
             res.on('data', function(chunk) {
                 data += chunk;
             });
             res.on('end', function() {
-                var match = utils.findScriptureMatch(passage);
+                var match = utils.findScriptureMatch(passage), success = false;
                 if(match) {
                     var jsonData = null;
                     try {
@@ -39,20 +42,20 @@ var BibleApi =  {
                     } catch(err) { console.log(err); }
 
                     if(jsonData && data && data.length && jsonData.bookname.toLowerCase() == utils.getBookName(match) && jsonData.chapter == match[match.length - 1]) {
-                        callback(null, JSON.parse(data));
-                        return;
+                        success = true;
+                        d.resolve(JSON.parse(data));
                     }
                 }
 
-                callback("error retrieving " + passage + "... does it exist?");
+                if(!success)
+                    d.reject("error retrieving " + passage + "... does it exist?");
             });
         })
         .on('error', function(error) {
-            console.log("error from calling BibleApi with " + passage);
-            console.log(error);
-
-            callback(error);
+            d.reject(error);
         });
+
+        return d.promise;
     }
 }
 

@@ -18,7 +18,8 @@
     "passport": "*",
     "passport-singly": "*",
     "underscore": "*",
-    "mongodb": "*"
+    "mongodb": "*",
+    "q": "~0.8.12"
   },
   "devDependencies": {
     "vows": "0.7.0"
