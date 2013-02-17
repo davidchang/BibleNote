@@ -1,7 +1,7 @@
 var express = require('express')
   , http = require('http')
   , path = require('path')
-  , BibleAPI = require('./BibleAPI.js')
+  , BibleAPI = require('net-bible-api')
   , utils = require('./utils.js')
   , _ = require('underscore')
   , redis = require('redis')
