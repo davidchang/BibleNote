@@ -5,48 +5,11 @@ var express = require('express')
   , utils = require('./utils.js')
   , _ = require('underscore')
   , redis = require('redis')
-  , client = redis.createClient()
-  , passport = require('passport');
+  , client = redis.createClient();
 
 client.on('error', function(err) {
     console.log('redis error ' + err);
 });
-
-/* singly */
-var SinglyStrategy = require('passport-singly').Strategy;
-
-var SINGLY_APP_ID = process.env.SINGLY_APP_ID || "f405c5fdcb0b59c4515883ad700b1836";
-var SINGLY_APP_SECRET = process.env.SINGLY_APP_SECRET || "a2713e559a9f70827066711ebaff0960";
-
-var CALLBACK_URL = process.env.CALLBACK_URL || "http://localhost:3000/auth/singly/callback";
-
-passport.serializeUser(function (user, done) {
-      done(null, user);
-});
-
-passport.deserializeUser(function (obj, done) {
-      done(null, obj);
-});
-
-function ensureAuthenticated(req, res, next) {
-      if (req.isAuthenticated())
-          return next();
-
-      res.redirect('/login');
-}
-
-passport.use(new SinglyStrategy({
-    clientID: SINGLY_APP_ID,
-    clientSecret: SINGLY_APP_SECRET,
-    callbackURL: CALLBACK_URL
-  },
-  function (accessToken, refreshToken, profile, done) {
-    process.nextTick(function () {
-      return done(null, profile);
-    });
-  }
-));
-/* singly */
 
 var app = express();
 
@@ -60,8 +23,6 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.session({ secret: 'keyboard cat' }));
-  app.use(passport.initialize());
-  app.use(passport.session());
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -74,13 +35,6 @@ app.configure('development', function(){
 app.get('/login', function(req, res) {
     res.render('login', {user: req.user, title: 'BibleNote | Login'});
 });
-
-app.get('/auth/singly/callback', passport.authenticate('singly', {
-    failureRedirect: '/login',
-    successReturnToOrRedirect: '/'
-}));
-
-app.get('/auth/singly/:service', passport.authenticate('singly'));
 
 app.get('/logout', function(req, res) {
     req.logout();
