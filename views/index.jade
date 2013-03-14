@@ -6,12 +6,11 @@ html(ng-app="App", lang="en")
     link(rel='stylesheet', href='/stylesheets/style.css')
   body(ng-controller="BibleNoteCtrl")
     header#header
-      .wrapper
+      .wrapper.clearfix
         #title.pull-left
           a(href='/') BibleNote.com
         #account.pull-right
-          a(href='/login') Log in
-        .clear
+          a(href='/auth/facebook') Log in
     .wrapper
       header
         h1= title

@@ -5,11 +5,47 @@ var express = require('express')
   , utils = require('./utils.js')
   , _ = require('underscore')
   , redis = require('redis')
-  , client = redis.createClient();
+  , client = redis.createClient()
+  , everyauth = require('everyauth');
 
 client.on('error', function(err) {
     console.log('redis error ' + err);
 });
+
+everyauth.facebook
+  .appId('423558631071549')
+  .appSecret('df917d5cdd068b9a98b911ce9bb23dc7')
+  .findOrCreateUser( function (session, accessToken, accessTokExtra, fbUserMetadata) {
+
+      var promise = this.Promise();
+      promise.fulfill(addOrGetUser(fbUserMetadata));
+      return promise;
+  })
+  .redirectPath('/');
+
+/*
+everyauth.everymodule
+  .findUserById(function(userId, cb) {
+      client.get('users', function(err, reply) {
+          console.log('calling the cb ' + reply);
+        cb(err, err ? null : JSON.parse(reply));
+      });
+  });
+  */
+
+function addOrGetUser (fbUserMetadata) {
+    client.get('users', function(err, reply) {
+
+        if(err || reply == null) {
+            var data = { id: 1, data: fbUserMetadata };
+            client.set('users', JSON.stringify(data), function(err, reply) {
+                return data;   
+            });
+        }
+        else
+            return JSON.parse(reply);
+    });
+}
 
 var app = express();
 
@@ -23,6 +59,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.session({ secret: 'keyboard cat' }));
+  app.use(everyauth.middleware());
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -30,15 +67,7 @@ app.configure(function(){
 
 app.configure('development', function(){
   app.use(express.errorHandler());
-});
-
-app.get('/login', function(req, res) {
-    res.render('login', {user: req.user, title: 'BibleNote | Login'});
-});
-
-app.get('/logout', function(req, res) {
-    req.logout();
-    res.redirect('/');
+  everyauth.debug = true;
 });
 
 app.post('/saveNotes/', function(req, res) {
@@ -157,8 +186,10 @@ app.get('/:text', function(req, res) {
 });
 
 app.get('/', function(req, res) {
-    console.log(req.user);
-    res.render('index', { title: 'BibleNote.com', user: req.user });   
+    if(req.session && req.session.uid)
+        return res.render('index', { title: 'nope' });
+
+    res.render('index', { title: 'BibleNote.com' });
 });
 
 http.createServer(app).listen(app.get('port'), function(){

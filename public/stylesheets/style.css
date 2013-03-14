@@ -71,9 +71,6 @@ body {
 #header a {
   color: white;
 }
-.clear {
-  clear: both;
-}
 .noMarginLeft {
   margin-left: 0px !important;
 }

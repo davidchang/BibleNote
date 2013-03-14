@@ -15,15 +15,9 @@
     "jade": "*",
     "less-middleware": "*",
     "connect-redis": "*",
-    "passport": "*",
-    "passport-singly": "*",
     "underscore": "*",
-    "mongodb": "*",
-    "q": "~0.8.12",
-    "net-bible-api": "latest"
-  },
-  "devDependencies": {
-    "vows": "0.7.0"
+    "net-bible-api": "latest",
+    "everyauth": "*"
   },
   "engines": {
     "node": "0.8.x",
