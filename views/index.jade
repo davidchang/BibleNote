@@ -5,12 +5,7 @@ html(ng-app="App", lang="en")
     link(rel='stylesheet', href='//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body(ng-controller="BibleNoteCtrl")
-    header#header
-      .wrapper.clearfix
-        #title.pull-left
-          a(href='/') BibleNote.com
-        #account.pull-right
-          a(href='/auth/facebook') Log in
+    include header
     .wrapper
       header
         h1= title

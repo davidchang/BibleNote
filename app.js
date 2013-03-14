@@ -6,46 +6,57 @@ var express = require('express')
   , _ = require('underscore')
   , redis = require('redis')
   , client = redis.createClient()
-  , everyauth = require('everyauth');
+  , passport = require('passport')
+  , FacebookStrategy = require('passport-facebook').Strategy;
 
 client.on('error', function(err) {
     console.log('redis error ' + err);
 });
 
-everyauth.facebook
-  .appId('423558631071549')
-  .appSecret('df917d5cdd068b9a98b911ce9bb23dc7')
-  .findOrCreateUser( function (session, accessToken, accessTokExtra, fbUserMetadata) {
+passport.use(new FacebookStrategy({
+    clientID: '423558631071549',
+    clientSecret: 'df917d5cdd068b9a98b911ce9bb23dc7',
+    callbackURL: '/auth/facebook/callback'
+},
+    function(accessToken, refreshToken, userData, done) {
+        client.get('users', function(err, reply) {
 
-      var promise = this.Promise();
-      promise.fulfill(addOrGetUser(fbUserMetadata));
-      return promise;
-  })
-  .redirectPath('/');
+            if(err) {
+                done(err); return;
+            }
 
-/*
-everyauth.everymodule
-  .findUserById(function(userId, cb) {
-      client.get('users', function(err, reply) {
-          console.log('calling the cb ' + reply);
-        cb(err, err ? null : JSON.parse(reply));
-      });
-  });
-  */
+            var allUsers = {};
+            try {
+                allUsers = JSON.parse(reply);
+                if(allUsers[userData.id]) {
+                    done(null, allUsers[userData.id]);
+                    return;
+                }
+            } catch (err) { }
 
-function addOrGetUser (fbUserMetadata) {
-    client.get('users', function(err, reply) {
+            allUsers[userData.id] = userData;
+            
+            client.set('users', JSON.stringify(allUsers), function(err, reply) {
+                if(err) { done(err); return; }
 
-        if(err || reply == null) {
-            var data = { id: 1, data: fbUserMetadata };
-            client.set('users', JSON.stringify(data), function(err, reply) {
-                return data;   
+                done(null, userData);   
             });
-        }
-        else
-            return JSON.parse(reply);
-    });
-}
+        });
+    })
+);
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  client.get('users', function(err, reply) {
+    try {
+        var allUsers = JSON.parse(reply);
+        done(err, allUsers[id]);
+    } catch (err) { done("could not deserialize user"); }
+  });
+});
 
 var app = express();
 
@@ -59,16 +70,21 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.session({ secret: 'keyboard cat' }));
-  app.use(everyauth.middleware());
-  app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.use(app.router);
 });
 
 app.configure('development', function(){
   app.use(express.errorHandler());
-  everyauth.debug = true;
 });
+
+app.get('/auth/facebook', passport.authenticate('facebook'));
+app.get('/auth/facebook/callback', passport.authenticate('facebook', {
+    successRedirect: '/Nahum2',
+    failureRedirect: '/Nahum3' }));
 
 app.post('/saveNotes/', function(req, res) {
     var data = req.body; 
@@ -151,14 +167,12 @@ app.get('/get/:text', function(req, res) {
                         try {
                             notes = JSON.parse(reply);
                             notes = notes[passage];
+
+                            for(var i = 0, len = notes.length; i < len; ++i) {
+                                if(data[notes[i].verse - 1])
+                                    data[notes[i].verse - 1].note = notes[i].note;
+                            }
                         } catch(err) { }
-                    }
-
-                    notes = JSON.parse(notes);
-
-                    for(var i = 0, len = notes.length; i < len; ++i) {
-                        if(data[notes[i].verse - 1])
-                            data[notes[i].verse - 1].note = notes[i].note;
                     }
 
                     res.end(JSON.stringify({ theText: data, thePassage: passage }));
@@ -186,10 +200,9 @@ app.get('/:text', function(req, res) {
 });
 
 app.get('/', function(req, res) {
-    if(req.session && req.session.uid)
-        return res.render('index', { title: 'nope' });
-
-    res.render('index', { title: 'BibleNote.com' });
+    if(req.user)
+        console.log(req.user);
+    res.render('index', { title: 'BibleNote.com', user: req.user });
 });
 
 http.createServer(app).listen(app.get('port'), function(){

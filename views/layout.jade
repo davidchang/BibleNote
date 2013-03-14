@@ -5,16 +5,7 @@ html(ng-app="App", lang="en")
     link(rel='stylesheet', href='//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body(ng-controller="BibleNoteCtrl")
-    header#header
-      .wrapper.clearfix
-        #title.pull-left
-          a(href='/') BibleNote.com
-        #account.pull-right
-          - if(everyauth.loggedIn)
-            Logged in as #{everyauth.facebook.user.name}
-            a(href='/logout') Log out
-          - else
-            a(href='/auth/facebook') Log in
+    include header
     .wrapper
       block content
     script(src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.1.1/angular.min.js')
