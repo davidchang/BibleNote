@@ -25,8 +25,6 @@ App.controller('BibleNoteCtrl', ['$scope', 'Bible', function($scope, Bible) {
             speaker: $scope.sermonSpeaker,
             oldTitle: !savedSermonTitle || savedSermonTitle == $scope.sermonTitle ? null : savedSermonTitle
         }, function(error, res) {
-            console.log(res);
-
             savedSermonTitle = $scope.sermonTitle;
         });
     }

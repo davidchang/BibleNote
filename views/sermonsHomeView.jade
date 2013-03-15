@@ -1,0 +1,8 @@
+extends layout
+
+block content
+  .row-fluid(ng-repeat="sermon in sermons")
+    .span12 {{sermon.title}} by {{sermon.speaker}}
+
+block controllerScript
+  script(src='/javascripts/sermonsHomeController.js')

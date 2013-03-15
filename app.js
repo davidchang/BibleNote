@@ -83,7 +83,7 @@ app.configure('development', function(){
 
 app.get('/auth/facebook', passport.authenticate('facebook'));
 app.get('/auth/facebook/callback', passport.authenticate('facebook', {
-    successRedirect: '/takeSermonNotes',
+    successRedirect: '/sermons',
     failureRedirect: '/' }));
 
 app.post('/saveNotes/', function(req, res) {
@@ -124,7 +124,7 @@ app.post('/saveSermonNotes/', function(req, res) {
 
     console.log(data);
 
-    var user = 'user2';
+    var user = req.user.id;
 
     client.get(user, function(err, reply) {
         var dbData = {};
@@ -140,6 +140,8 @@ app.post('/saveSermonNotes/', function(req, res) {
             if(data.oldTitle)
                 delete dbData['sermons'][data.oldTitle];
         }
+
+        delete data.oldTitle;
 
         dbData['sermons'][data.title] = data;
         client.set(user, JSON.stringify(dbData), function(err, reply) {
@@ -188,6 +190,19 @@ app.get('/get/:text', function(req, res) {
 
 app.get('/takeSermonNotes', function(req, res) {
     res.render('takeSermonNotesView', { title: 'BibleNote.com', user: req.user });   
+});
+
+app.get('/sermons', function(req, res) {
+    res.render('sermonsHomeView', { title: 'BibleNote.com', user: req.user });   
+});
+
+app.get('/getSermons', function(req, res) {
+    var id = req.user.id;
+
+    client.get(id, function(err, reply) {
+        res.writeHead(200, { "Content-Type" : 'application/json' });
+        res.end(reply);
+    });
 });
 
 app.get('/:text/takeNotes', function(req, res) {

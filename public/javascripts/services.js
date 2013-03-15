@@ -16,8 +16,15 @@ App.service('Bible', ['$http', function($http) {
             });
     };
 
+    this.getSermons = function(callback) {
+        $http.get('/getSermons/')
+            .then(function(res) {
+                callback(res);
+            });
+    };
+
     this.saveSermonNotes = function(notesObject, callback) {
-        $http.post('/saveSermonNotes/', { notes: JSON.stringify(notesObject) })
+        $http.post('/saveSermonNotes/', notesObject )
             .then(function(res) {
                 callback(res.data !== 'OK', res);
             });
