@@ -83,8 +83,8 @@ app.configure('development', function(){
 
 app.get('/auth/facebook', passport.authenticate('facebook'));
 app.get('/auth/facebook/callback', passport.authenticate('facebook', {
-    successRedirect: '/Nahum2',
-    failureRedirect: '/Nahum3' }));
+    successRedirect: '/takeSermonNotes',
+    failureRedirect: '/' }));
 
 app.post('/saveNotes/', function(req, res) {
     var data = req.body; 
@@ -187,7 +187,6 @@ app.get('/get/:text', function(req, res) {
 });
 
 app.get('/takeSermonNotes', function(req, res) {
-    console.log(req.user);
     res.render('takeSermonNotesView', { title: 'BibleNote.com', user: req.user });   
 });
 
@@ -200,8 +199,6 @@ app.get('/:text', function(req, res) {
 });
 
 app.get('/', function(req, res) {
-    if(req.user)
-        console.log(req.user);
     res.render('index', { title: 'BibleNote.com', user: req.user });
 });
 

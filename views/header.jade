@@ -1,0 +1,9 @@
+header#header
+  .wrapper.clearfix
+    #title.pull-left
+      a(href='/') BibleNote.com
+    #account.pull-right
+      - if(user)
+        span Logged in as #{user.displayName}
+      - else
+        a(href='/auth/facebook') Log in

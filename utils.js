@@ -20,7 +20,7 @@ var utils = {
 
         if(match) {
             var passage = this.cleanPassageTitle(match.slice(1).join(' '));
-            res.render(view, { title: passage });
+            res.render(view, { title: passage, user: req.user });
         }
         else
             onFailure();
